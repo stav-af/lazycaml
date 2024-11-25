@@ -1,0 +1,21 @@
+; (test
+;  (name test_codegen)
+;  (modules test_codegen)
+;  (libraries compiler.codegen fixtures))
+
+; (test
+;  (name test_defs)
+;  (modules test_defs)
+;  (libraries compiler.defs fixtures))
+
+(test
+ (name test_lexer)
+ (modules test_lexer fixtures)
+ (libraries 
+  compiler.lexer  
+  compiler.defs))
+
+(test
+ (name test_parser)
+ (modules test_parser fixtures)
+ (libraries compiler.parser compiler.lexer))

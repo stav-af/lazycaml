@@ -1,0 +1,4 @@
+(library
+ (name defs)
+ (public_name compiler.defs)
+ (modules globals fun regex))
