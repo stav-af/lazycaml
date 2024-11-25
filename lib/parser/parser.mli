@@ -10,10 +10,8 @@ val _bterm : bexp parser
 val _bop: bop parser
 
 val _aexp : aexp parser
-val _aexp_list : aexp parser
 val _aterm : aexp parser
 val _afinal : aexp parser
 
-val _args : args parser
 val _def : def parser
 val _prog : prog parser

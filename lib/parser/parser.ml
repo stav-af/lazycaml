@@ -108,49 +108,52 @@ and _bterm: bexp parser = fun inp ->
   ((_aexp ++ _bcomp ++ _aexp) >>= fun ((a, b), c) -> COMP(b, a, c)) |~|
   ((_lp ++ _bexp ++ _rp) >>= fun ((_, b), _) -> b)) inp
 
-and _aexp: aexp parser = fun inp -> 
+
+
+  
+and _aexp: aexp parser = fun inp ->
   (
-    (_aterm) |~| 
-    (_id >>= fun s -> VAR(s)) |~| 
-    (_n) |~|
-    ((_aterm ++ _add ++ _aexp) >>= fun ((a, b), c) -> AEXP(b, a, c)) |~|
-    ((_write ++ _lp ++ _id ++ _rp) >>= fun (((_, _), a), _) -> WRITE_VAR(a)) |~|
-    ((_if ++ _bexp ++ _then ++ _aexp_list ++ _else ++ _aexp_list)
-        >>= fun (((((_, be), _), ib), _), tb) -> ITE(be, ib, tb)) |~|
-    ((_write ++ _lp ++ _id ++ _rp) >>= fun (((_, _), id), _) -> WRITE_VAR(id)) |~|
-    ((_write ++ _lp ++ _aexp ++ _rp) >>= fun (((_, _), e), _) -> WRITE_EXPR(e))
+    ((_if ++ _bexp ++ _then ++ _aexp ++ _else ++ _aexp)
+      >>= fun (((((_, be), _), ib), _), tb) -> ITE(be, ib, tb)) |~|
+    ((_acmd ++ _sc ++ _aexp) >>= fun ((e1, _), e2) -> SEQ(e1, e2)) |~| 
+    _aite
   ) inp
 
-and _aexp_list: aexp parser = fun inp -> 
+and _acmd = fun inp -> 
   (
-    _aexp |~|
-    ((_rb ++ (list_parser _aexp _sc) ++ _lb) >>= fun ((_, l), _) -> AEXP_SEQ(l))
+    ((_write ++ _aexp) >>= fun (_, e) -> WRITE_EXPR(e)) |~|
+    _asum
+  ) inp
+
+and _asum = fun inp -> 
+  (
+    ((_aterm ++ _add ++ _aexp) >>= fun ((a, b), c) -> AEXP(b, a, c)) |~|
+    _aterm
   ) inp
 
 and _aterm: aexp parser = fun inp ->
-  ((_afinal |~|
-  ((_afinal ++ _mult ++ _aterm) >>= fun ((a, b), c) -> AEXP(b, a, c)))) inp
-
-and _afinal: aexp parser = fun inp ->
-  ((_n |~|
-  ((_lp ++ _aexp ++ _rp) >>= fun ((_, b), _) -> b))) inp
-
-and _args: args parser = fun inp ->
   (
-    (_lp ++ (list_parser _aexp _comma) ++ _rp) 
-      >>= fun ((_, a), _) -> ARGS(a)
+   ((_afinal ++ _mult ++ _aterm) >>= fun ((a, b), c) -> AEXP(b, a, c)) |~|
+    _afinal 
   ) inp
 
+and _afinal: aexp parser = fun inp ->
+  (
+    _n |~|
+    (_id >>= fun s -> VAR(s)) |~|
+    ((_lp ++ _aexp ++ _rp) >>= fun ((_, b), _) -> b) |~|
+    ((_id ++ _lp ++ (list_parser _aexp _comma) ++ _rp) >>= fun (((name, _), args), _)-> CALL(name, args))
+  ) inp
 
 and _def: def parser = fun inp -> 
   (
-    (_define ++ _id ++ _args ++ _assign ++ _aexp_list)
-      >>= fun ((((_, s), a), _), bl) -> FUNC(s, a, bl)
+    (_define ++ _id ++ _lp ++ (list_parser _id _comma) ++ _rp ++ _assign ++ _aexp)
+      >>= fun ((((((_, s), _), a), _), _), bl) -> FUNC(s, a, bl)
   ) inp
 
 and _prog = fun inp ->
   (
     (_aexp >>= fun e -> EXP(e))|~|
-    ((_aexp ++ _prog) >>= fun (e, p) -> EXP_SEQ(e, p))|~|
-    ((_def ++ _prog) >>= fun (d, p) -> DEF_SEQ(d, p))
+    ((_aexp ++ _sc ++ _prog) >>= fun ((e, _), p) -> EXP_SEQ(e, p))|~|
+    ((_def ++ _sc ++ _prog) >>= fun ((d, _), p) -> DEF_SEQ(d, p))
   ) inp

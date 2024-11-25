@@ -15,24 +15,21 @@ type aop =
  | MOD
 
 type aexp = 
- | AEXP_SEQ of aexp list
+ | SEQ of aexp * aexp
  | AEXP of aop * aexp * aexp
  | VAR of string
  | VAL of int
  | ITE of bexp * aexp * aexp
- | WRITE_VAR of string
  | WRITE_EXPR of aexp
+ | CALL of string * aexp list
 
 and bexp =
  | TRUE | FALSE 
  | COMP of bcomp * aexp * aexp 
  | BEXP of bop * bexp * bexp
 
-type args =
- | ARGS of aexp list
-
 type def = 
- | FUNC of string * args * aexp
+ | FUNC of string * string list * aexp
 
 type prog = 
  | DEF_SEQ of def * prog

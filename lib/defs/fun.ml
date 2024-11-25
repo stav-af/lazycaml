@@ -15,7 +15,7 @@ let f_paren = fun c -> String.contains "({})" c
 let f_whitespace = fun c -> String.contains " \t\n\r" c
 
 let r_keyword = ~-"while" ||| ~-"if" ||| ~-"then" ||| ~-"else" ||| ~-"do" ||| ~-"for" 
-  ||| ~-"to" ||| ~-"true" ||| ~-"false" ||| ~-"read" ||| ~-"write" ||| ~-"skip"
+  ||| ~-"to" ||| ~-"true" ||| ~-"false" ||| ~-"read" ||| ~-"write" ||| ~-"skip" ||| ~-"def"
 let r_op = ~-"+" ||| ~-"-" ||| ~-"*" ||| ~-"%" ||| ~-"/" ||| ~-"==" ||| ~-"!="
   ||| ~-"<" ||| ~-">" ||| ~-"<=" ||| ~-">=" ||| ~-":=" ||| ~-"&&" ||| ~-"||" ||| ~-"="
 
@@ -30,7 +30,7 @@ let r_whitespace = CFun("ws", f_whitespace)
 let r_identifier = r_letter ** Star(CFun("f_id", fun c -> f_letter c || f_digit c) ||| Char '_')
 let r_number = Char '0' ||| (CFun("f_n", fun c -> (c >= '1' && c <= '9')) ** Star(r_digit))
 let r_str = Char '"' ** Star(CFun("f_s", fun c -> f_letter c || f_symbol c || f_digit c || f_paren c || f_whitespace c)) ** Char '"'
-let r_comment = ~-"//" ** Star(Char(' ') ||| CFun("f_com", fun c -> f_letter c || f_symbol c || f_paren c || f_digit c)) ** Char '\n'
+let r_comment = ~-"//" ** Star(Char(' ') ||| r_op ||| CFun("f_com", fun c -> f_letter c || f_symbol c || f_paren c || f_digit c)) ** Char '\n'
 
 let fun_regs = Star(
   Recd("k", r_keyword) |||

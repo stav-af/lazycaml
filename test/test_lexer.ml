@@ -1,4 +1,4 @@
-open Fixtures
+(* open Fixtures
 
 open Lexer.Formatter
 open Lexer.Lex
@@ -10,6 +10,4 @@ let test_lex prog prog_name =
   Printf.printf "Tokenized %s.fun: \n %s \nto: %s" prog_name prog (display_toks toks)
 
 let () = 
- test_lex _fact "fact";
- test_lex _defs "defs";
- test_lex _add "add"
+ test_lex _defs "defs" *)

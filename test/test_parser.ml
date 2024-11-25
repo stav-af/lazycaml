@@ -14,17 +14,16 @@ let test_parse prog prog_name =
       fun (_, rest) -> rest = []
     ) parse 
   then 
-    Printf.printf "Successfully parsed %s" prog_name
-  else 
-    Printf.printf "Failed to parse %s \n" prog_name;
+    (Printf.printf "Successfully parsed %s" prog_name)
+  else (
+    Printf.printf "FAILED ON %S %n" prog_name (List.length parse);
     List.iter (
-      fun (_, rest) -> Printf.printf("%s\n") (display_toks rest)
-    ) parse 
-  (* Printf.printf "Parsed %s.fun: \n %s \nto: %s" prog_name prog (display_toks toks) *)
+      fun (_, rest) -> Printf.printf "%s\n" (display_toks rest)
+    ) parse)
 
 let () = 
   test_parse _add "add";
   test_parse _fact "fact";
   test_parse _defs "defs"
- 
+  
  

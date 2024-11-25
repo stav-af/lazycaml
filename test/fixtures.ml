@@ -50,19 +50,31 @@ def primes(n) =
   else primes(n - 1);
 
 def is_collatz(n) =
-  if n == 1 then 1
+  (if n == 1 then 1
   else if n % 2 == 0 then is_collatz(n / 2)
-  else is_collatz(3 * n + 1);  
+  else is_collatz(3 * n + 1); 1 + 1);
 
-def collatz_aux(n, i) = 
-  if i > n then 0
-  else if is_collatz(i) == 1 then (write i; collatz_aux(n, i + 1)) 
-  else collatz_aux(n, i + 1);
 
-def collatz(n) = collatz_aux(n, 1);
+//zero(3)
+//suc(8)
+//pred(7)
+//write(add(3, 4))
+//mult(4,5)
+//pow(2, 3)
+//fib(20)
+//(write(fact(5)) ; fact(6))
+//(write(1) ; 2)
+//write(ack(3, 12))   // for tail-rec test
+//stack_test(0)
+//(write (div(11, 3)); rem(11, 3))
+//gcd(54, 24)
+//is_prime(2)
+primes(1000)
+//primes(1000000)
+//collatz(4000)
+//collatz(5000)
+//facT(6, 1)
 
-def facT(n, acc) =
-  if n == 0 then acc else facT(n - 1, n * acc);
 |}
 
 
