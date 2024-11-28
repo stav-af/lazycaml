@@ -1,4 +1,4 @@
-open Ast
+open Defs.Ast
 
 type tokens = (string * string) list
 type 'a parser = tokens -> ('a * tokens) list
@@ -13,5 +13,5 @@ val _aexp : aexp parser
 val _aterm : aexp parser
 val _afinal : aexp parser
 
-val _def : def parser
+val _def : decl parser
 val _prog : prog parser

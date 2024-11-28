@@ -22,16 +22,16 @@ type aexp =
  | ITE of bexp * aexp * aexp
  | WRITE_EXPR of aexp
  | CALL of string * aexp list
+ | ASSIGN of string * int
 
 and bexp =
  | TRUE | FALSE 
  | COMP of bcomp * aexp * aexp 
  | BEXP of bop * bexp * bexp
 
-type def = 
+type decl = 
  | FUNC of string * string list * aexp
 
 type prog = 
- | DEF_SEQ of def * prog
- | EXP_SEQ of aexp * prog
- | EXP of aexp
+ | DEF_SEQ of decl * prog
+ | MAIN of aexp

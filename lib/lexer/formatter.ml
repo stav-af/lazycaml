@@ -1,4 +1,109 @@
 open Defs.Regex
+open Defs.Ast
+
+let indent_string indent = String.make indent ' '
+
+let rec pretty_delim = function
+  | NONE -> ""
+
+and pretty_bcomp = function
+  | GT -> ">"
+  | LT -> "<"
+  | GE -> ">="
+  | LE -> "<="
+  | EQ -> "=="
+  | NE -> "!="
+
+and pretty_bop = function
+  | CONJ -> "&&"
+  | DISJ -> "||"
+  | BEQ -> "=="
+  | BNE -> "!="
+
+and pretty_aop = function
+  | ADD -> "+"
+  | SUB -> "-"
+  | MULT -> "*"
+  | DIV -> "/"
+  | MOD -> "%"
+
+and pretty_aexp indent = function
+  | SEQ (a1, a2) ->
+      Printf.sprintf "%sSEQ(\n%s,\n%s\n%s)" 
+        (indent_string indent)
+        (pretty_aexp (indent + 1) a1)
+        (pretty_aexp (indent + 1) a2)
+        (indent_string indent)
+  | AEXP (op, a1, a2) ->
+      Printf.sprintf "%sAEXP(%s, %s, %s)"
+        (indent_string indent)
+        (pretty_aop op)
+        (pretty_aexp (indent + 1) a1)
+        (pretty_aexp (indent + 1) a2)
+  | VAR name -> Printf.sprintf "VAR(%s)" name
+  | VAL value -> Printf.sprintf "VAL(%d)" value
+  | ITE (cond, a1, a2) ->
+      Printf.sprintf "%sITE(\n%s,\n%s,\n%s\n%s)"
+        (indent_string indent)
+        (pretty_bexp (indent + 1) cond)
+        (pretty_aexp (indent + 1) a1)
+        (pretty_aexp (indent + 1) a2)
+        (indent_string indent)
+  | WRITE_EXPR expr ->
+      Printf.sprintf "%sWRITE_EXPR(\n%s\n%s)"
+        (indent_string indent)
+        (pretty_aexp (indent + 1) expr)
+        (indent_string indent)
+  | CALL (name, args) ->
+      Printf.sprintf "%sCALL(%s, [%s])"
+        (indent_string indent)
+        name
+        (String.concat "; " (List.map (pretty_aexp 0) args))
+  | ASSIGN (var, value) ->
+      Printf.sprintf "%sASSIGN(%s, %d)"
+        (indent_string indent)
+        var value
+
+and pretty_bexp indent = function
+  | TRUE -> Printf.sprintf "%sTRUE" (indent_string indent)
+  | FALSE -> Printf.sprintf "%sFALSE" (indent_string indent)
+  | COMP (comp, a1, a2) ->
+      Printf.sprintf "%sCOMP(%s, %s, %s)"
+        (indent_string indent)
+        (pretty_bcomp comp)
+        (pretty_aexp 0 a1)
+        (pretty_aexp 0 a2)
+  | BEXP (op, b1, b2) ->
+      Printf.sprintf "%sBEXP(%s, %s, %s)"
+        (indent_string indent)
+        (pretty_bop op)
+        (pretty_bexp 0 b1)
+        (pretty_bexp 0 b2)
+
+and pretty_decl indent = function
+  | FUNC (name, args, body) ->
+      Printf.sprintf "%sFUNC(%s, [%s],\n%s\n%s)"
+        (indent_string indent)
+        name
+        (String.concat ", " args)
+        (pretty_aexp (indent + 1) body)
+        (indent_string indent)
+
+and pretty_prog indent = function
+  | DEF_SEQ (decl, prog) ->
+      Printf.sprintf "%sDEF_SEQ(\n%s,\n%s\n%s)"
+        (indent_string indent)
+        (pretty_decl (indent + 1) decl)
+        (pretty_prog (indent + 1) prog)
+        (indent_string indent)
+  | MAIN expr ->
+      Printf.sprintf "%sMAIN(\n%s\n%s)"
+        (indent_string indent)
+        (pretty_aexp (indent + 1) expr)
+        (indent_string indent)
+
+let pretty_print ast = pretty_prog 0 ast
+
 
 let rec display_value v =
   match v with

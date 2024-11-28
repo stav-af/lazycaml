@@ -1,4 +1,4 @@
-open Ast
+open Defs.Ast
 
 type tokens = (string * string) list
 type 'a parser = tokens -> ('a * tokens) list
@@ -116,7 +116,7 @@ and _aexp: aexp parser = fun inp ->
     ((_if ++ _bexp ++ _then ++ _aexp ++ _else ++ _aexp)
       >>= fun (((((_, be), _), ib), _), tb) -> ITE(be, ib, tb)) |~|
     ((_acmd ++ _sc ++ _aexp) >>= fun ((e1, _), e2) -> SEQ(e1, e2)) |~| 
-    _aite
+    _acmd
   ) inp
 
 and _acmd = fun inp -> 
@@ -145,7 +145,7 @@ and _afinal: aexp parser = fun inp ->
     ((_id ++ _lp ++ (list_parser _aexp _comma) ++ _rp) >>= fun (((name, _), args), _)-> CALL(name, args))
   ) inp
 
-and _def: def parser = fun inp -> 
+and _def: decl parser = fun inp -> 
   (
     (_define ++ _id ++ _lp ++ (list_parser _id _comma) ++ _rp ++ _assign ++ _aexp)
       >>= fun ((((((_, s), _), a), _), _), bl) -> FUNC(s, a, bl)
@@ -153,7 +153,7 @@ and _def: def parser = fun inp ->
 
 and _prog = fun inp ->
   (
-    (_aexp >>= fun e -> EXP(e))|~|
-    ((_aexp ++ _sc ++ _prog) >>= fun ((e, _), p) -> EXP_SEQ(e, p))|~|
+    (_aexp >>= fun e -> MAIN(e))|~|
+    (* ((_aexp ++ _sc ++ _prog) >>= fun ((e, _), p) -> EXP_SEQ(e, p))|~| *)
     ((_def ++ _sc ++ _prog) >>= fun ((d, _), p) -> DEF_SEQ(d, p))
   ) inp

@@ -1,0 +1,5 @@
+(library
+ (name codegen)
+ (public_name compiler.codegen)
+ (libraries defs)
+ (modules kast codegen))
